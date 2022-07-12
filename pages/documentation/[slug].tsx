@@ -145,9 +145,9 @@ const PostPage = ({
 
           setValue(content);
         });
-        item.addEventListener('mouseleave', (e) => {
-          setValue('');
-        });
+        // item.addEventListener('mouseleave', (e) => {
+        //   setValue('');
+        // });
       }
   }, []);
 
@@ -224,19 +224,19 @@ const PostPage = ({
           </h1>
           <div className="px-5 prose dark:prose-dark">
             <MDXRemote {...source} components={components} />
-            <div
-              className={`interface-preview rounded-sm z-10 overflow-hidden text-gray-800 absolute bg-white ${
+            {/* <div
+              className={`interface-preview rounded-sm z-10 overflow-hidden text-neutral-300 absolute bg-neutral-800 ${
                 value ? 'block' : 'hidden'
               }`}
               style={{ top: position.top, left: position.left, maxWidth: 400 }}
               dangerouslySetInnerHTML={{ __html: value }}
-            />
-                        {/* <div
+            /> */}
+                        <div
               className={`interface-preview rounded-sm text-sm z-10 overflow-hidden px-2 py-1  text-[#BFC8F3] absolute ${
                 value ? 'block' : 'hidden'
               }`}
               style={{ top: position.top, left: position.left, maxWidth: 400, whiteSpace: 'pre-wrap', background: '#16161E', border: 'solid 1px #101014' }}
-            >{value}</div> */}
+            >{value}</div>
           </div>
 
           {/* Show previous and next post */}
