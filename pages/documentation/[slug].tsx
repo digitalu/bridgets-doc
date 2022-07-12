@@ -145,9 +145,9 @@ const PostPage = ({
 
           setValue(content);
         });
-        // item.addEventListener('mouseleave', (e) => {
-        //   setValue('');
-        // });
+        item.addEventListener('mouseleave', (e) => {
+          setValue('');
+        });
       }
   }, []);
 
