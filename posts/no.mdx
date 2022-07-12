@@ -1,0 +1,62 @@
+---
+title: What is BridgeTS?
+category: Introduction
+---
+
+## Basic
+
+```ts twoslash
+let foo = 'hello there!';
+```
+
+## AS const
+
+```ts twoslash
+let foo = 'hello there!' as const;
+
+interface Lol {
+  code: string;
+  name: string;
+  node: Array<number>;
+}
+
+const test = (param: Lol) => 'Yo';
+
+const route = (param: Lol) => 'Yo';
+
+```
+
+## Demo
+
+```ts twoslash
+let x = 'hello';
+//    ^^^^^^^^^^
+```
+
+```ts twoslash
+// @noErrors
+import { Controller, createMiddleware, apply } from 'bridgets';
+import { z } from 'zod';
+
+const mid = createMiddleware((req) => {
+    return {user: true}
+})
+
+class ControllerExample extends Controller {
+    test = this.createEndpoint({
+        middlewares: apply(mid),
+        headers: z.object({ user: z.string()}),
+        body: z.object({ age1: z.number(), age2: z.number(), age3: z.number(), age4: z.number()}),
+        handler: ({body, headers, mid}) => {
+            body.a
+//                ^|
+            return 'hello';
+        },
+    })
+}
+
+interface Essai {
+    node: Array<Controller>;
+}
+
+```

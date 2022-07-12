@@ -1,0 +1,107 @@
+---
+title: Controllers
+category: Controllers
+order: 1
+---
+
+Controllers are responsible for handling incoming **requests** and returning **responses** to the client.
+
+<!-- ##### Controllers = packet de endpoint
+##### utilisation avancée -> endoints peuvent communiquer avec les autres endpoints -->
+
+<Image
+  alt={`controller`}
+  src={`/blog/controllers.svg`}
+  quality="100"
+  layout="fill"
+  priority
+  description="Controller example"
+/>
+
+A controller's purpose is to **receive** specific requests and transfer it to the associated endpoint which will send the respons to the client. The [routes object](/documentation/routing) decides which controller receives which requests. Frequently, each controller has **more than one** route, and different routes can perform different actions.
+
+BridgeTS uses **class controllers**. Each controller created has to extend the `Controller` class from `bridgets`.
+
+## Most basic example
+
+Here is a quick example of a `User` controller containing **2 endpoints**.
+
+```typescript
+import { Controller } from 'bridgets';
+
+export class User extends Controller {
+  hello = this.createEndpoint({
+    method: 'GET',
+    handler: () => {
+      return 'Hello World';
+    },
+  });
+  bye = this.createEndpoint({
+    method: 'GET',
+    handler: () => {
+      return 'Bye World';
+    },
+  });
+}
+```
+
+We use the `this.createEndpoint()` method to create 2 endpoints in the `User` controller. The `handler` is the function that is run when the endpoint is called by a client.
+
+In addition to that, several other things can be configured for each endpoint like the `method`, the `body`, the `middlewares`, the `headers` and the `query`. 
+
+You can find a more detailed explanation of each parameters in the [endpoint documentation](/documentation/endpoints). A more complete example can be found below.
+
+```typescript twoslash
+import { z } from 'zod'
+import { Controller } from 'bridgets'
+
+export class User extends Controller {
+  hello = this.createEndpoint({
+    body: z.object({name: z.string(), age: z.number()}),
+    headers: z.object({ IP: z.string() }),
+    query: z.object({ id: z.string() }),
+    middlewares: [authenticationMiddleware], // any middleware that will be executed before the handler
+    handler: ({body, query}) => {
+      return 'Hello ${body.name}, you are authenticated';
+    },
+  });
+}
+```
+
+<Info text="Please note that the 'method' is not specified. By default, each endpoint is a 'POST' request. We strongly encourage you only use 'POST' request as it proposes more data types (dates, numbers) which can't be passed using 'query'." />
+
+##### A déplacer
+
+| Name            | Type                                                                          | Description                                                                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **method**      | `"POST"`, `"GET"`, `"PUT"`, `"PATCH"`, `"DELETE"`                             | The method of the endpoint. <br/> The default value is `POST`.                                                                                                                                          |
+| **query**       | `z.object({...}))`                                                            | The allowed querie parameters. <br /> These are validated by zod. <br/> <br/>[Read more about query validation](/documentation/validations).                                                            |
+| **body**        | `z.object(Record<string, any>)` <br/> **example:** `z.object({name: string})` | **default value:** `void` <br/> The body content. Note that it doesn't work with method:`GET`. The body is validated by _zod_ <br/> <br/> [Read more about body validation](/documentation/validations) |
+| **files**       | `[]string`                                                                    | **default value:** `void` <br/> Not allowed if _body_ is compelted.                                                                                                                                     |
+| **middlewares** | `[]createMiddleware`                                                          | **default value:** `[]` <br/> An array of middlewares. [Read more about middlewares](/documentaion/iddlewares)                                                                                          |
+| **handler**     | `() => void ??`                                                               | **default value:** `POST` <br/> The method of the endpoint.                                                                                                                                             |
+| **description** | `string`                                                                      | You can give here some explanation. That will appear in the generated SDK. <br/> <br/> [Read more about SDK Generation](/documentation/sdk)                                                             |
+
+### method
+
+The method is the HTTP method that will be used to receive the request. It has to be one of the following: `GET`, `POST`, `PUT`, `DELETE`. By default, it's value is `POST`.
+
+### body
+
+The `body` is an object that will be validated against the schema defined in the `body` property of the endpoint. This validation is done using the [_zod_](/documentation/validator) module (more validators will be proposed in the next versions).
+
+<Info text="Note that the body DOES NOT work with the GET method." />
+
+```typescript
+import { Controller } from 'bridgets';
+import { z } from "zod"
+// ...
+body: z.object({
+    name: z.string(),
+    age: z.number().min(18).max(124),
+})
+```
+
+### query
+
+Receive and validate data from the query params sent by the client.

@@ -1,0 +1,131 @@
+---
+title: Middleware
+category: Controllers
+order: 3
+---
+
+##### as const. 
+
+Middleware is a function which is called **before** the route handler. Middleware functions have access to the request object.
+
+<Image src="/blog/middleware.svg" description="Middleware before Handler" />
+
+Bridgets middleware are, by default, equivalent to express middleware. The following description from the official express documentation describes the capabilities of middlewares:
+
+Middleware functions can perform the following tasks:
+
+- Execute any code
+- Make changes to the request and response objects
+- End the request-response cycle.
+
+## Applying middleware
+
+The `createEndpoint` method of a `Controller` takes  `middlewares` as argument. You can pass middleware functions created with `createMiddleware` using `apply`. These functions are called in the order they are passed.
+
+<Image
+  src="/blog/multiple-middleware.svg"
+  description="Applying multiplate middlewares"
+/>
+
+The middleware fuctions have to return either an `object` or `void`.
+
+
+```typescript
+import { Controller, createMiddleware, apply } from 'bridgets';
+
+const function1 = createMiddleware((req) => {
+  console.log('First middleware');
+});
+
+const function2 = createMiddleware((req) => {
+  console.log('Second middleware');
+});
+
+export class ControllerExample extends Controller {
+  get = this.createEndpoint({
+    middlewares: apply(function1, function2),
+    handler: () => {
+      console.log('I handle the request...');
+      return 'Hello World!';
+    },
+  });
+}
+```
+The console output would be:
+```bash file=console
+First middleware
+Second middleware
+I handle the request
+```
+
+## Transfering data
+
+One of the usecases of middlewares is to transfer data **between middlewares** or to **pass data** to the `handler`. 
+
+```typescript
+import { Controller, createMiddleware, apply } from 'bridgets';
+
+const function1 = createMiddleware((req) => {
+  return { firstName: 'John' };
+});
+
+const function2 = createMiddleware((req) => {
+  return { lastName: 'Doe' };
+});
+
+export class ControllerExample extends Controller {
+  endpoint = this.createEndpoint({
+    middlewares: apply(function1, function2),
+    handler: ({middlewares}) => {
+      return `Hello ${middlewares.firstName} ${middlewares.lastName}!`;
+    },
+  });
+}
+```
+Objects returned by the `createMiddleware` functions are available in the `middlewares` property of the `handler`. Moreover, the interface of the `middlewares` object of the `handler` is **infered** which means that you can benefit from **Typscript validation** and **auto-completion** ! 
+
+<Info text="Please note that returning an object having the same keys with different middlewares would override the value." />
+
+## Returning errors
+
+Middleware are usually used to **return errors** to the client. A typical use case would be an **authentication system** where you would check if the user is authenticated and has the permission to access the endpoint. If not, you would return an error to the client.
+
+Errors can be created with `createHttpError`. Whenever an error is created or thrown with `throw new Error()`, **the request won't be handled** by the endpoint and **won't be passed to the next middleware**.
+
+[Read more on error handling](/documentation/)
+
+```typescript
+import { Controller, createMiddleware, createHttpError } from 'bridgets';
+import { z } from 'zod';
+
+const authenticate = createMiddleware((req) => {
+  console.log("Authenticating...");
+  if (req.query.name !== 'Dave') {
+    return createHttpError('Unauthorized', 'You are not Dave !');
+  }
+  return { authenticated: true }  as const;
+});
+
+export class User extends Controller {
+  get = this.createEndpoint({
+    query: z.object({name: z.string()}),
+    middlewares: [authenticate],
+    handler: ({query, middleware}) => {
+      console.log("You're authenticated. Hi Dave !");
+      console.log(middleware);
+      return `Hi Dave`;
+    },
+  });
+}
+```
+
+The console output when the right request is made would be:
+
+```bash file=console
+Authenticating...
+You're authenticated. Hi Dave !
+{ middleware: { authenticated: true } }
+```
+
+<!--  Finir ici -->
+<Info text="You could eventually validate the queries params and the body with middlewares but that woulnd't be a good pratice. Try to always separate the validation of the format and the ...  " />

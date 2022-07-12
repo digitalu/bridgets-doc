@@ -1,0 +1,81 @@
+---
+title: Creating
+description: I care deeply for nature. Oh, you're gonna be in a coma, all right. He'll want to use your yacht, and I don't want this thing smelling like fish. Get me a vodka rocks. And a piece of toast. No! I was ashamed to be SEEN with you. I like being with you.
+date: '2021-03-20'
+image: '/images/bridge.jpg'
+---
+
+React is famously unopinionated when it comes to file/directory structure. How should you structure the files and directories in your applications?
+
+Well, there is no one “right” way, but I've tried lots of different approaches in the 7+ years I've been using React, and I've iterated my way to a solution I'm really happy with.
+
+T'escr
+```
+Déjà vu ça
+```
+
+In this blog post, I'll share the structure I use across all my current projects, including this blog and my custom course platform.
+
+## Interactive file explorer
+
+Alright, so I'll explain everything in depth, but I thought it'd be fun to let you take a self-guided tour first.
+
+Here's an interactive file explorer. Feel free to poke around and see how things are [structured](https://duckduckgo.com)!
+
+### Example 1
+
+There are all kinds of fun bells and whistles we can add to it:
+
+- Keep track of how many games each player has won
+- Enhance the UI with more presentational components
+- Allow the board size to be configured (4x4, 5x5)
+- Add an AI that the player can play against
+- Whimsy! (animations, sound effects, confetti on victory, etc)
+
+Be creative, and pick things you're genuinely interested in!
+
+This strategy is nice because you avoid the stress of a blank canvas. You already have a fully-functional, well-understood project. You're adding bricks to a solid foundation.
+
+It also has a nice side-benefit: if you add significant extensions to a tutorial project, you can take credit for it in your portfolio! I cover this strategy in depth in my book, [Building an Effective Dev Portfolio](https://duckduckgo.com).
+```
+<Info
+  title="Finding the right balance"
+  text="When I'm at the very beginning of a learning journey, I tend to focus primarily on guided learning. It's difficult to build anything in an unguided way when I'm still grappling with the syntax and the fundamentals!"
+/>
+```
+Your graph might look a bit different; ultimately, it's up to you to find the right balance! The important thing is that we don't focus exclusively on guided or unguided learning.
+
+## Mindset cultivation
+
+Many years ago, I went bowling with some friends.
+
+I didn't do well. Most of my balls wound up in the gutter. By the end of the game, I had the lowest score out of the group by far.
+
+There are two different ways to interpret this scenario:
+
+```jsx
+const Card = ({
+  image,
+  position,
+  prevPosition,
+  title,
+  description,
+  genres,
+}) => {
+  const genresText = genres.join(', ');
+  return (
+    <div className="relative h-80 overflow-hidden rounded-md group">
+      <img className="inset-0 absolute" src={image} />
+      <div
+        className="absolute bottom-0 z-0 h-24 w-full"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(33, 38, 47, 0) 0%, rgba(33, 38, 47, 0.5) 37.35%, rgba(33, 38, 47, 0.8) 100%)',
+        }}
+      ></div>
+    </div>
+  );
+};
+```
+
+There are two different ways to interpret this scenario:

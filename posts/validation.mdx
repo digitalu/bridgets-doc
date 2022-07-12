@@ -1,0 +1,120 @@
+---
+category: Server
+title: Validation
+---
+It is best practice to validate the correctness of any data sent into a web application. To automatically validate incoming requests, Bridge provides support for *zod*, available right out-of-the-box:
+
+These following elements can be validated:
+- The `body`
+- The `query` 
+- `files`
+
+### Query validation
+
+You validate each query sent by the server parameter. 
+- Each key of the object has to be a string. 
+- **The value has to be a string !**
+
+In other words, it means that only *z.string()* is working for each query validation. If you want to receive and validate other types of data (dates, integers, arrays, etc.), consider using a `POST` request and validate the *body*.
+
+```typescript
+import { Controller } from 'bridgets';
+import { z } from "zod"
+
+export class User extends Controller {
+  get = this.createEndpoint({
+    query: z.object({ name: z.string(), age: z.string()}),
+    method: 'GET',
+    handler: ({ query }) => {
+      return `Hello ${query.name} you are ${query.age} years old`;
+    },
+  });
+} 
+```
+
+If your app is running on port 8080 and the router correctly links /user to the User controller. You can execute the following HTTP request:
+```bash
+curl http://localhost:8080/user/get?name=John&age=20 
+```
+your will get a response: `Hello John you are 20 years old`
+
+If no queries are specified, an error will be sent to the client detailing the missing elements.
+
+**Request**
+```bash
+http://localhost:8080/user/get
+```
+
+**Response:**
+```json
+{
+    "error": {
+        "status": 422,
+        "name": "The query parameters does not respect the schema.",
+        "data": [
+            {
+                "code": "invalid_type",
+                "expected": "string",
+                "received": "undefined",
+                "path": [
+                    "name"
+                ],
+                "message": "Required"
+            },
+            {
+                "code": "invalid_type",
+                "expected": "string",
+                "received": "undefined",
+                "path": [
+                    "age"
+                ],
+                "message": "Required"
+            }
+        ]
+    }
+}
+```
+
+
+### Body validation
+The body validation works the same way as the query validation. However, you can valide **more complex data structures** such as *arrays* and *objects*. 
+
+Here is a quick example:
+
+```typescript
+export class User extends Controller {
+  create = this.createEndpoint({
+    // method: 'POST' is optionnal because it's the default value
+    body: z.object({ 
+        name: z.string().min(1).max(99), 
+        age: z.number().min(18).max(100), 
+        sex: z.string().optional()
+        }),
+    handler: ({ body }) => {
+      return `Hello ${body.name} you are ${body.age} years old`;
+    },
+  });
+} 
+```
+
+The **/create** endpoint should receive an object with the following keys:
+- `name` : a string with a minimum length of 1 and a maximum length of 99
+- `age` : a number with a minimum value of 18 and a maximum value of 100
+- `sex`: an optionnal string
+
+<Notice text="Find more information about all the possibilities of data validation in 'zod' " />
+
+Any invalid request will send an error to the client without being processed by the handler.
+
+The main advantage here is that Typescript knows what the `body` argument contains. With Visual Studio Code, you can hover over the `body` argument and see the type of the argument.
+It should be the following:
+<Image src="/blog/example-hover.png" description="Interface of 'body'"  style={{width: 250, marginLeft: 'auto', marginRight: 'auto'}} alt="Interface of 'body'" />
+
+You can now use the power of Typescript to write faster code, knowing what you received from the client.
+
+- method
+- body
+- query
+- headers
+- files
+- handler

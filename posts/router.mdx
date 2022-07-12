@@ -1,0 +1,65 @@
+---
+category: Server
+title: Routing
+---
+
+## Basic routing
+
+Create a file called `routes.js` in the `src` directory.
+
+This example is the most basic route possible in Bridge with a basic *Controller*
+
+```typescript
+import { Controller, createEndpoint } from 'bridgets';
+
+// type Routes = {[key:string]: Routes | Controller}
+export const routes = {
+    user: new User(),
+}
+
+class User extend Controller {
+  // '/user/get'
+  get = this.createEndpoint({
+    method: 'GET',
+    handler: () => {
+      return 'Hello World!';
+    }
+  })
+}
+```
+
+##### Router + exemple d'arborescence
+
+We export an object *routes* and import it in the file where your express app is. 
+
+We can then use *createExpressMiddleware* from *bridgets* to create a middleware that will handle the routes created by Bridge.
+
+```typescript
+import express from 'express';
+import { createExpressMiddleware } from 'bridgets';
+// import the routes object from the file where we created the routes
+import { routes } from './routes';
+
+const app = express();
+const port = 8080;
+
+// We add the routes created to the express app
+app.use('/', createExpressMiddleware(routes));
+
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
+});
+```
+
+## Nested routes
+
+You can have more complex routing:
+
+```typescript
+export const routes = {
+    admin: {
+      users: new Admin()
+    }
+}
+
+```

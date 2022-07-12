@@ -1,0 +1,52 @@
+---
+title: Error Handling
+category: Controllers
+---
+Bridge natively implements several ways to handle errors. There would be 2 kind of errors:
+- **Validation** error : when the data sent by the client is not valid.
+- **Server** error : when the server is not able to fulfill the request. 
+
+If used in a **RESTful** API, the **Validation** error should be returned with a **422** status code. If you are using the suggested approach using *zod* validators, this should be automatically handled.
+
+You can read more about validation errors in the [zod documentation]() and [client validation](/documentation/validation)
+
+As for the **Server error**, we usually don't want to send the client the full stacktrace.
+
+
+
+## Handling server error
+
+For handling server errors, Bridge provides a **global error handler** *onError*. It is called when an error occurs.
+
+Here a quick example
+
+```typescript
+import express from 'express';
+import { createExpressMiddleware, onError } from 'bridgets';
+import { routes } from './routes';
+
+const app = express();
+const port = 8081;
+
+const errorHandler = onError(({ error, path, req }) => {
+  if (error.name === 'Internal server error') console.log('Server error', error, path); // Send to bug reporting
+  else console.log('Other error', error, path);
+});
+
+app.use('', createExpressMiddleware(routes, errorHandler));
+
+app.use('', (req, res, next) => res.status(404).send('Root not found'));
+
+app.get('/', (req, res) => res.send('Express + TypeScript Server'));
+
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
+});
+
+```
+
+
+| First Header | Second header |
+| -- | -- |
+| First cell   | Second cell   |
+| Third cell   | Fourth cell   |

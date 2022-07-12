@@ -1,0 +1,16 @@
+---
+category: Endpoint
+title: Endpoint
+---
+
+## createEnpoint
+
+| Name | Type | Description |
+| --- | --- | --- |
+| **method** | `"POST"`, `"GET"`, `"PUT"`, `"PATCH"`, `"DELETE"` |The method of the endpoint. <br/> The default value is `POST`. |
+| **query** | `z.object({...}))` | The allowed querie parameters. <br /> These are validated by zod. <br/> <br/>[Read more about query validation](/documentation/validations). |
+| **body** | `z.object(Record<string, any>)` <br/> **example:** `z.object({name: string})` |**default value:** `void` <br/> The body content. Note that it doesn't work with method:`GET`. The body is validated by *zod* <br/> <br/>  [Read more about body validation](/documentation/validations) |
+| **files** | `[]string` |**default value:** `void` <br/> Not allowed if *body* is compelted. |
+| **middlewares** |`[]createMiddleware` |**default value:** `[]` <br/> An array of middlewares. [Read more about middlewares](/documentaion/iddlewares) |
+| **handler** | `() => void ??` |**default value:** `POST` <br/> The method of the endpoint. |
+| **description** | `string` | You can give here some explanation. That will appear in the generated SDK. <br/> <br/> [Read more about SDK Generation](/documentation/sdk) |

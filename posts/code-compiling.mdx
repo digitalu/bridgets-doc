@@ -1,0 +1,160 @@
+---
+title: Compiling the SDK
+category: [SDK]
+order: 4
+---
+
+BridgeTS gives you the ability to automatically generate  the SDK for **any Typescript client**. Its a great way to always have the latest SDKs available and easily use them in your project. It **improves** by a lot the developer experience, reduces friction and makes the code more readable.
+
+Bridge's SDK generation is a simple process that generates a client library for a **Typescript** client.
+
+It can be used with common frontend frameworks such as _React_ _Nextjs_ and _Vue_ as well as with _Angular_ and _Svelte_. The code generated is agnostic of the framework you use as long as it supports **Typescript**.
+
+Thus it can also be used with Backend frameworks like **Node.js** and **Express.js**.
+
+## Requirements
+### Working environment
+
+Your app needs to be fully functional which means:
+
+- [Your router](Routing) needs to be configured properly
+- Having at least 1 [controller](documentation/controllers)
+
+In addition to that, you have to export the type of the `Routes`.
+
+### Export the type of the Routes
+
+For the types and the SDK to be properly generated, the type you the routes needs to be exported using the `RoutesToSDK` function.
+
+```typescript
+import { RoutesToSDK } from 'bridge-ts';
+import { User } from "./controllers/User" // Any controller
+
+const routes = {
+    user: new User(),
+}
+
+export type AnyNameYouWant = RoutesToSDK<typeof routes>;
+```
+
+You can find a more detailed example below.
+
+```typescript
+import express from 'express';
+import { createExpressMiddleware, RoutesToSDK } from 'bridgets';
+import { routes } from './routes';
+
+const app = express();
+const port = 8081;
+
+app.use('', createExpressMiddleware(routes));
+
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+});
+
+export type RouteTypes = RoutesToSDK<typeof routes>;
+```
+
+### Create a config file
+
+Create a _bridgets.config.json_ file in your project. It can be located anywhere in your project. Ideally, it should be in the root of your project.
+
+```json file=bridgets.config.json
+{
+  "tsConfigLocation": "./tsconfig.json",
+  "typeLocation": "./src/index.ts",
+  "sdkLocation": "./sdk",
+  "sdkTypeName": "RouteTypes"
+}
+```
+
+- `tsConfigLocation`: The location of the tsconfig.json file.
+- `typeLocation`: The location of the file exporting the type of the Routes.
+- `sdkLocation`: The location where the SDK folder will be generated.
+- `sdkTypeName`: The name of the generated folder.
+
+<Structure
+  data={[
+    {
+      type: 'folder',
+      label: 'src',
+      branches: [
+        {
+          type: 'folder',
+          label: 'controllers',
+          branches: [
+            {
+              type: 'file',
+              label: 'user.ts',
+              comment: '# Controller',
+              branches: [],
+            },
+          ],
+        },
+        {
+            type: 'file',
+            label: 'routes.ts',
+            branches: [],
+        },
+        {
+            type: 'file',
+            label: 'index.ts',
+            comment: '# Your express sever',
+            branches: [],
+        }
+      ],
+    },
+    {
+      type: 'file',
+      label: 'package.json',
+      branches: [],
+    },
+    {
+      type: 'file',
+      label: 'bridgets.config.json',
+      comment: '# Configuration file for the bridgets',
+      branches: [],
+    },
+    {
+      type: 'file',
+      label: 'package-lock.json',
+      branches: [],
+      comment: 'package-lock.json',
+    },
+  ]}
+/>
+
+
+### Compiling the code
+
+To compile the code, the project can be launched with -c as argument.
+
+```bash
+npx ts-node ./src/index.ts -c
+```
+You can add that command to your `package.json` file to launch the compilation using `npm run compile`.
+
+```json file=package.json
+{
+  // ...
+  "scripts": {
+    "build": "npx tsc",
+    "compile": "npx ts-node ./src/index.ts -c",
+    "start": "node dist/index.js",
+    "dev": "nodemon --config nodemon.json ./src/index.ts"
+  },
+// ...
+}
+
+```
+
+### TADA
+
+The SDK can now be downloaded in your client using the `npx bridgets-sdk` command.
+
+```bash
+npx bridgets-sdk URL_OF_THE_SERVER
+```
+
+<Info text="Note that the server has to be running for the client to download the SDK. If you're running the server on localhost:8080, you can run npx bridgets-sdk localhost:8080" />

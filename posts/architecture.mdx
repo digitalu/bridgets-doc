@@ -1,0 +1,64 @@
+---
+title: "Architecture"
+category: "Controllers"
+order: 2
+---
+
+Express.js is unopinionated and is designed to be as simple as possible. It lets you do as **you** want.
+
+It is designed to be **easy to learn** and **easy to use**.
+
+Bridge wants to bring some order to give you the flexibility to do what you want, but in a scalable way.
+
+## Recommended architecture for a BridgeTS project
+
+Here is the example of a BridgeTS project with **3 controllers**.
+
+<Structure
+  data={[
+    {
+      type: 'folder',
+      comment: 'root folder',
+      label: 'src',
+      branches: [
+        {
+          type: 'folder',
+          label: 'invoice',
+          comment: 'where it enters',
+          branches: [
+            {
+              type: 'folder',
+              label: 'user',
+              branches: [
+                { type: 'file', label: 'index.ts', branches: [] },
+                { type: 'file', label: 'user.ts', branches: [] },
+                { type: 'file', label: 'invoice.ts', branches: [] },
+              ],
+            },
+            {
+              type: 'file', label: 'index.ts', branches: [],
+            }
+          ],
+        },
+        {
+          type: 'folder',
+          label: 'user',
+          comment: 'where it enters',
+          branches: [{ type: 'file', label: 'index.ts', branches: [] }],
+        },
+      ],
+    },
+    {
+      type: 'file',
+      label: 'package.json',
+      branches: [],
+      comment: 'package.json',
+    },
+    {
+      type: 'file',
+      label: 'package-lock.json',
+      branches: [],
+      comment: 'package-lock.json',
+    },
+  ]}
+/>
